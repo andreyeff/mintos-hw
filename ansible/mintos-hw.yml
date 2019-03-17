@@ -1,0 +1,53 @@
+# sudo ansible-galaxy install geerlingguy.mysql
+# sudo ansible-galaxy install geerlingguy.php
+# sudo ansible-galaxy install geerlingguy.apache
+# sudo ansible-galaxy install geerlingguy.apache-php-fpm
+# sudo ansible-galaxy install geerlingguy.composer
+
+# cd /automate/ansible && ansible-playbook -i inventory_mintos mintos-hw.yml --ask-vault-pass
+# Password: mintospass
+
+# Prepare local for dev deployment
+# - name: 
+#   hosts: localhost
+#   #see more vars in group_vars
+#   vars_files:
+#     - vaulted/vault_all.yml
+#   roles:
+#     - geerlingguy.mysql
+#     - geerlingguy.php
+#     - geerlingguy.apache
+#     - geerlingguy.apache-php-fpm
+#     - geerlingguy.composer
+#   tasks:
+#     - name: install packages
+#       apt:
+#         name:
+#           - "php{{ php_default_version_debian }}-zip"
+#           - unzip
+
+- name: setup database
+  hosts: theonlyhost
+  #see more vars in group_vars
+  vars_files:
+    - group_vars/vaulted/vault_all.yml
+  roles:
+    - geerlingguy.mysql
+    - geerlingguy.php
+    - geerlingguy.apache
+    - geerlingguy.apache-php-fpm
+    - geerlingguy.composer
+    - deploy-app
+
+# # Recreate demo app:
+#   composer create-project symfony/symfony-demo symfony-demo
+#   cd symfony-demo/
+#   composer require symfony/intl
+#   composer require symfony/polyfill-intl-messageformatter
+#   ./bin/console server:run 0.0.0.0:8000
+#   export APP_ENV=prod
+#   composer install --no-dev --optimize-autoloader
+#
+#   bin/console cache:clear --no-warmup
+#   bin/console cache:warmup
+#   php bin/console about

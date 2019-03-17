@@ -1,0 +1,19 @@
+mysql_user_home: /root
+mysql_user_name: root
+mysql_user_password: "{{ vault_mysql_user_password }}"
+mysql_root_password_update: false
+mysql_enabled_on_startup: true
+mysql_databases:
+  -
+    name: mintosdb
+mysql_users:
+  -
+    name: mintos
+    host: "%"
+    password: "{{ vault_mysql_users1_password }}"
+    priv: "mintosdb.*:ALL"
+    state: present
+php_default_version_debian: "7.2"
+composer_version: '1.8.4'
+
+apache2_www_app_dir: "/var/www/symfony-demo/"

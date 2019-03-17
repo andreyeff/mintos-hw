@@ -1,0 +1,53 @@
+
+- name: "ensure additional php{{ php_default_version_debian }} packages installed"
+  apt:
+    name:
+      - "php{{ php_default_version_debian }}-zip"
+      - php-mysql
+      - "libapache2-mod-php{{ php_default_version_debian }}"
+  notify: restart-apache2
+
+- name: ensure {{ apache2_www_app_dir }} exists
+  file:
+    path: "{{ apache2_www_app_dir }}"
+    state: directory
+
+- name: deploy app
+  synchronize:
+    src: /automate/symfony-demo/
+    dest: "{{ apache2_www_app_dir }}"
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=.env"
+      - "--exclude=var"
+      - "-avzh"
+
+- name: "ensure {{ apache2_www_app_dir }}var directory exists"
+  file:
+    path: "{{ apache2_www_app_dir }}var"
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: "ensure ownership of {{ apache2_www_app_dir }}"
+  file:
+    path: "{{ apache2_www_app_dir }}"
+    recurse: yes
+    owner: www-data
+    group: www-data
+
+- name: ensure variables are configured
+  lineinfile:
+    path: /etc/environment
+    regex: "^export {{ item.key }}"
+    line: "export {{ item.key }}={{ item.value }}"
+  with_dict:
+    APP_ENV: prod
+    APP_DEBUG: 0
+    APP_SECRET: some_secret_value_123
+    DATABASE_URL: "mysql://{{ mysql_users[0].name }}:{{ mysql_users[0].password }}@{{ groups['databases'].0 }}:3306/{{ mysql_databases[0].name }}"
+    MAILER_URL: "null://localhost"
+  no_log: true
+
+- name: update apache configuration
+  import_tasks: update-apache.yml

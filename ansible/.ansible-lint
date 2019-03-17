@@ -1,0 +1,11 @@
+# Prerequisite:
+#   sudo pip install ansible-lint
+# Run:
+#   ansible-lint ./*.yml
+#
+# To ignore a task, add tag "skip_ansible_lint"
+
+parseable: true
+quiet: true
+use_default_rules: true
+verbosity: 1

@@ -1,0 +1,5 @@
+ansible/*.retry
+.vagrant
+local_boxes/.vagrant
+local_boxes/insecure_ssh_key
+tmp/

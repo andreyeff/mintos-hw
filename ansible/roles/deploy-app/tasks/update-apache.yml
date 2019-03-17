@@ -1,0 +1,32 @@
+- name: deploy /etc/apache2/sites-available/001-mintos.conf configuration
+  template:
+    src: mintos.conf
+    dest: /etc/apache2/sites-available/001-mintos.conf
+    owner: www-data
+    group: www-data
+  notify: reload-apache2
+
+- name: disable /etc/apache2/sites-available/000-default.conf
+  command: a2dissite 000-default
+  notify: restart-apache2
+  tags: "skip_ansible_lint" # no module to disable site in apache2
+
+- name: enable /etc/apache2/sites-available/001-mintos.conf
+  command: a2ensite 001-mintos
+  args:
+    creates: /etc/apache2/sites-enabled/001-mintos.conf
+  notify: restart-apache2
+  tags: "skip_ansible_lint" # no module to enable site in apache2
+
+- name: make apache pick environment variables on start
+  lineinfile:
+    path: /etc/apache2/envvars
+    line: ". /etc/environment"
+    owner: www-data
+    group: www-data
+
+- name: ensure apache2 is started up
+  service:
+    name: apache2
+    state: started
+    enabled: yes

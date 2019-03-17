@@ -1,0 +1,21 @@
+[all:vars]
+ansible_user = "vagrant"
+ansible_become = true
+ansible_ssh_private_key_file = /home/vagrant/.ssh/insecure_key
+ansible_python_interpreter=/usr/bin/python3
+
+
+[all]
+central     ansible_host="192.168.0.5"
+worker1     ansible_host="192.168.0.11"
+worker2     ansible_host="192.168.0.12"
+
+[theonlyhost]
+worker1
+
+[databases:children]
+theonlyhost
+
+[webservers:children]
+theonlyhost
+
